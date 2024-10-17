@@ -1,0 +1,3 @@
+# Add URLs to crawl in this file, one URL per line
+http://example.com
+http://another-example.com
