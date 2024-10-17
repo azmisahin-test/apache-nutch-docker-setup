@@ -1,0 +1,43 @@
+version: '3'
+services:
+  nutch:
+    image: apache/nutch:latest
+    container_name: nutch
+    environment:
+      - NUTCH_HOME=/opt/nutch
+    volumes:
+      - ./nutch:/opt/nutch
+    command: "/opt/nutch/runtime/local/bin/nutch"
+    networks:
+      - nutch-net
+    depends_on:
+      - hadoop
+
+  hadoop:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    container_name: hadoop
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    volumes:
+      - ./hadoop:/hadoop/dfs/name
+    networks:
+      - nutch-net
+    ports:
+      - 9870:9870
+    command: "namenode"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - nutch-net
+
+networks:
+  nutch-net:
+    driver: bridge
